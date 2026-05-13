@@ -1,0 +1,11 @@
+[detector]
+max_pool_age_secs = 45
+min_liquidity_sol = 8.0
+min_buy_count_30s = 18
+max_dev_sell_pct  = 4.0
+
+[scorer]
+min_score = 75
+
+[stream]
+commitment = "confirmed"

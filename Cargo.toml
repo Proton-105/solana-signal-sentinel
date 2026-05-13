@@ -1,0 +1,28 @@
+[package]
+name = "solana-signal-sentinel"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "solana-signal-sentinel"
+path = "src/main.rs"
+
+[dependencies]
+yellowstone-grpc-client = "6.0.0"
+yellowstone-grpc-proto  = "6.0.0"
+tokio                   = { version = "1", features = ["full"] }
+futures                 = "0.3"
+tonic                   = "0.12"
+anyhow                  = "1.0"
+dotenvy                 = "0.15"
+config                  = "0.14"
+serde                   = { version = "1.0", features = ["derive"] }
+serde_json              = "1.0"
+reqwest                 = { version = "0.12", features = ["json"] }
+tracing                 = "0.1"
+tracing-subscriber      = { version = "0.3", features = ["env-filter"] }
+chrono                  = { version = "0.4", features = ["serde"] }
+bs58                    = "0.5"
+
+[profile.release]
+opt-level = 3
