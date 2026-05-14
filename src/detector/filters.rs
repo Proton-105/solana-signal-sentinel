@@ -1,5 +1,5 @@
-use crate::config::DetectorConfig;
 #![allow(dead_code, unused_variables)]
+use crate::config::DetectorConfig;
 use crate::signal::types::{Signal, Source};
 use chrono::Utc;
 use yellowstone_grpc_proto::prelude::SubscribeUpdateTransactionInfo;

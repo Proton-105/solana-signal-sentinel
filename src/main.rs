@@ -12,7 +12,9 @@ use tokio::sync::mpsc;
 use tracing::info;
 
 use crate::signal::types::Signal;
-use crate::stream::mock::MockStream;
+// use crate::stream::mock::MockStream;           // mock-режим
+// use crate::stream::yellowstone::YellowstoneStream; // gRPC режим ($499/мес)
+use crate::stream::rpc_poller::RpcPoller;          // RPC polling режим (бесплатно)
 use crate::poster::telegram_poster::TelegramPoster;
 use crate::utils::dedup::DedupCache;
 
@@ -22,19 +24,31 @@ async fn main() -> Result<()> {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    info!("🚀 Starting Solana Signal Sentinel [MOCK MODE]...");
+    info!("🚀 Starting Solana Signal Sentinel [RPC MODE]...");
 
-    let env        = config::load_env()?;
-    let app_config = config::load_config()?;
+    let env = config::load_env().map_err(|e| {
+        eprintln!("❌ Failed to load env: {e:#}");
+        e
+    })?;
+
+    let app_config = config::load_config().map_err(|e| {
+        eprintln!("❌ Failed to load config: {e:#}");
+        e
+    })?;
 
     info!("✅ Configuration loaded.");
 
     let (tx, mut rx) = mpsc::unbounded_channel::<Signal>();
 
-    // Mock stream таск
-    let mock = MockStream::new(tx);
+    let helius_key = std::env::var("HELIUS_API_KEY")
+        .unwrap_or_default();
+    let rpc_url = format!(
+        "https://mainnet.helius-rpc.com/?api-key={}",
+        helius_key
+    );
+    let poller = RpcPoller::new(rpc_url, tx);
     tokio::spawn(async move {
-        mock.run().await;
+        poller.run().await;
     });
 
     // Telegram poster
